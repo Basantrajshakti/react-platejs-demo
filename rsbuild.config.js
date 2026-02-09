@@ -1,0 +1,14 @@
+// @ts-check
+import { defineConfig } from '@rsbuild/core';
+import { pluginReact } from '@rsbuild/plugin-react';
+
+// Docs: https://rsbuild.rs/config/
+export default defineConfig({
+  plugins: [pluginReact()],
+  html: {
+    template: './index.html',
+  },
+  server: {
+    port: 3000,
+  },
+});
