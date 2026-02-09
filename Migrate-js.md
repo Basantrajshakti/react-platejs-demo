@@ -35,6 +35,8 @@ Convert TS/TSX to JS/JSX, remove TS tooling/config, keep runtime deps.
    - prefer `.jsx` for React files.
 1. Cleanup temp output
    - `Remove-Item -Recurse -Force .tmp-js`
+1. Prune TS deps + refresh lockfile
+   - `yarn install`
 
 ## Manual Edits (non-command)
 1. Add `jsconfig.json` for path aliases (JS only tooling).
@@ -42,6 +44,7 @@ Convert TS/TSX to JS/JSX, remove TS tooling/config, keep runtime deps.
 1. Update `lefthook.yml` to remove TS/TSX globs.
 1. Update `package.json` to remove TS scripts + dev deps.
 1. Update text in `src/app/page.jsx` from `page.tsx` to `page.jsx`.
+1. Update `biome.jsonc` to remove `!next-env.d.ts` ignore.
 
 ## Exact Config Changes
 
@@ -129,6 +132,15 @@ module.exports = nextConfig;
    }
 ```
 
+### `biome.jsonc` (before/after)
+```diff
+-  "files": {
+-    "includes": ["**", "!!node_modules", "!!build", "!!.next", "!next-env.d.ts"]
+-  },
++  "files": {
++    "includes": ["**", "!!node_modules", "!!build", "!!.next"]
++  },
+```
+
 ## Notes
-- TS runtime libs kept. No TS typecheck/config remains.
-- lockfile still has TS deps until reinstall.
+- TS tooling removed. JS/JSX only.
