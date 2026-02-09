@@ -1,0 +1,25 @@
+{
+  "name": "plate-editor-server",
+  "version": "1.0.0",
+  "description": "Backend server for Plate.js editor - handles AI and file upload endpoints",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@ai-sdk/gateway": "^2.0.15",
+    "ai": "5.0.28",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "platejs": "^52.0.1",
+    "uploadthing": "7.7.4",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

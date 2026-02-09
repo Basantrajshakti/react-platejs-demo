@@ -7,7 +7,14 @@
     }
   },
   "files": {
-    "includes": ["**", "!!node_modules", "!!build", "!!.next"]
+    "includes": [
+      "**",
+      "!!node_modules",
+      "!!build",
+      "!!.next",
+      "!!server",
+      "!!react"
+    ]
   },
   "linter": {
     "rules": {
