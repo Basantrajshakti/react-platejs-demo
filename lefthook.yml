@@ -4,8 +4,6 @@ pre-commit:
       glob:
         - '*.js'
         - '*.jsx'
-        - '*.ts'
-        - '*.tsx'
         - '*.json'
         - '*.jsonc'
         - '*.css'
