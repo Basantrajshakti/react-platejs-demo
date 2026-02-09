@@ -23,7 +23,8 @@ Convert TS/TSX to JS/JSX, remove TS tooling/config, keep runtime deps.
    - replaces with JS/JSX.
 1. Replace Next config with JS version
    - `Copy-Item -Force .tmp-js/next.config.js next.config.js`
-   - then adjust to CJS + `__dirname`.
+   - convert to ESM config: create `next.config.mjs` w/ `export default`
+   - use `import.meta.url` to derive `__dirname` in ESM.
 1. Remove TS config files
    - `Remove-Item -Force tsconfig.json, next-env.d.ts`
    - no TS tooling left.
@@ -48,8 +49,13 @@ Convert TS/TSX to JS/JSX, remove TS tooling/config, keep runtime deps.
 
 ## Exact Config Changes
 
-### `next.config.ts` -> `next.config.js`
+### `next.config.ts` -> `next.config.mjs`
 ```js
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // TEMPLATE ONLY
@@ -71,7 +77,7 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
 ```
 
 ### `jsconfig.json` (new)
