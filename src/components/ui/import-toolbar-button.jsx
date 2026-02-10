@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from './dropdown-menu';
 import { ToolbarButton } from './toolbar';
+import { importDocx } from '@platejs/docx-io';
 export function ImportToolbarButton(props) {
   const editor = useEditorRef();
   const [open, setOpen] = React.useState(false);
@@ -46,6 +47,15 @@ export function ImportToolbarButton(props) {
       editor.tf.insertNodes(nodes);
     },
   });
+  const { openFilePicker: openDocxFilePicker } = useFilePicker({
+    accept: ['.docx'],
+    multiple: false,
+    onFilesSelected: async ({ plainFiles }) => {
+      const arrayBuffer = await plainFiles[0].arrayBuffer();
+      const result = await importDocx(editor, arrayBuffer);
+      editor.tf.insertNodes(result.nodes);
+    },
+  });
   return (
     <DropdownMenu modal={false} onOpenChange={setOpen} open={open} {...props}>
       <DropdownMenuTrigger asChild>
@@ -70,6 +80,13 @@ export function ImportToolbarButton(props) {
             }}
           >
             Import from Markdown
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => {
+              openDocxFilePicker();
+            }}
+          >
+            Import from Word
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -1,3 +1,4 @@
+import { exportToDocx, downloadDocx } from '@platejs/docx-io';
 import { MarkdownPlugin } from '@platejs/markdown';
 import { ArrowDownToLineIcon } from 'lucide-react';
 import { createSlateEditor } from 'platejs';
@@ -5,6 +6,8 @@ import { useEditorRef } from 'platejs/react';
 import { serializeHtml } from 'platejs/static';
 import * as React from 'react';
 import { BaseEditorKit } from '../editor/editor-base-kit';
+import { DocxKit } from '../editor/plugins/docx-kit';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -119,6 +122,31 @@ export function ExportToolbarButton(props) {
     const url = `data:text/markdown;charset=utf-8,${encodeURIComponent(md)}`;
     await downloadFile(url, 'plate.md');
   };
+  const exportToWord = async () => {
+    // @ts-ignore
+    window.global = window
+    const blob = await exportToDocx(editor.children, {
+      editorPlugins: [...BaseEditorKit, ...DocxKit],
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'plate.docx';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    // // @ts-ignore
+    // window.global = window
+    // const blob = await exportToDocx(editor.children, {
+    //   orientation: 'portrait',
+    //   margins: { top: 1440, bottom: 1440, left: 1440, right: 1440 },
+    //   fontFamily: 'Calibri',
+    // });
+
+    // downloadDocx(blob, 'document.docx');
+  };
   return (
     <DropdownMenu modal={false} onOpenChange={setOpen} open={open} {...props}>
       <DropdownMenuTrigger asChild>
@@ -140,6 +168,9 @@ export function ExportToolbarButton(props) {
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={exportToMarkdown}>
             Export as Markdown
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={exportToWord}>
+            Export as Word
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
