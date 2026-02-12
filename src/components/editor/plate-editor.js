@@ -1,5 +1,5 @@
 import { normalizeNodeId } from 'platejs';
-import { Plate, usePlateEditor } from 'platejs/react';
+import { Plate, PlateController, useEditorMounted, usePlateEditor } from 'platejs/react';
 import { EditorKit } from './editor-kit';
 import { SettingsDialog } from './settings-dialog';
 import { Editor, EditorContainer } from '../ui/editor';
@@ -7,19 +7,59 @@ import { Editor, EditorContainer } from '../ui/editor';
 export function PlateEditor() {
   const editor = usePlateEditor({
     plugins: EditorKit,
-    value,
+    value: async () => {
+      // Simulate fetching data from an API
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return localStorage.getItem('editorContent') ? JSON.parse(localStorage.getItem('editorContent'))
+        : value;
+      return value;
+    },
+    onReady: (editor) => {
+      // EditorStateManager is better to be rendered after the editor is ready
+      console.info('Editor is ready!', editor);
+    },
+    autoSelect: 'end',
   });
 
   return (
-    <Plate editor={editor}>
-      <EditorContainer>
-        <Editor variant="fullWidth" />
-      </EditorContainer>
+    <PlateController>
+      <Plate editor={editor} onChange={({ editor }) => {
+        const isContentChange = editor.operations.some(
+          op => op.type !== 'set_selection'
+        );
 
-      <SettingsDialog />
-    </Plate>
+        if (isContentChange) {
+          localStorage.setItem('editorContent', JSON.stringify(editor.children));
+          console.log('Editor content changed:', editor.children);
+        }
+      }}>
+        <EditorStateManager editor={editor} />
+        <EditorContainer>
+          <Editor variant="fullWidth" />
+        </EditorContainer>
+
+        <SettingsDialog />
+      </Plate>
+    </PlateController>
   );
 }
+
+// Component to manage states and loadings
+function EditorStateManager() {
+  // const value = useEditorSelector(editor => editor.children, []);
+  const isMounted = useEditorMounted();
+
+  // useEffect(() => {
+  // console.log('Editor content changed:', value);
+  // }, [value]);
+
+  if (!isMounted) {
+    return <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>Loading...</div>;
+  }
+
+  return null
+}
+
 const value = normalizeNodeId([
   {
     children: [{ text: 'Welcome to the Plate Playground!' }],
