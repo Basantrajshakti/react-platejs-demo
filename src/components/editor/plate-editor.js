@@ -1,19 +1,40 @@
 import { normalizeNodeId } from 'platejs';
-import { Plate, PlateController, useEditorMounted, usePlateEditor } from 'platejs/react';
+import { createPlatePlugin, Plate, PlateController, PlateElement, useEditorMounted, usePlateEditor } from 'platejs/react';
 import { EditorKit } from './editor-kit';
 import { SettingsDialog } from './settings-dialog';
 import { Editor, EditorContainer } from '../ui/editor';
 
+const CustomComponent = ({ attributes }) => {
+  return (
+    <div {...attributes} contentEditable={false} className='mb-6 mt-10'>
+      <h3 className='text-xl font-bold'>Custom Component</h3>
+      <input className='form-control border!' type="text" disabled value="Hello World!" />
+    </div>
+  );
+};
+
+const customComponentPlugin = createPlatePlugin({
+  key: 'custom_component',
+  node: { isElement: true },
+});
+
 export function PlateEditor() {
   const editor = usePlateEditor({
-    plugins: EditorKit,
+    plugins: [...EditorKit, customComponentPlugin],
     value: async () => {
       // Simulate fetching data from an API
       await new Promise((resolve) => setTimeout(resolve, 100));
-      return localStorage.getItem('editorContent') ? JSON.parse(localStorage.getItem('editorContent'))
-        : value;
+      // return localStorage.getItem('editorContent')
+      //   ? JSON.parse(localStorage.getItem('editorContent'))
+      //   : value;
       return value;
     },
+    override: {
+      components: {
+        ['custom_component']: CustomComponent,
+      },
+    },
+
     onReady: (editor) => {
       // EditorStateManager is better to be rendered after the editor is ready
       console.info('Editor is ready!', editor);
@@ -64,6 +85,10 @@ const value = normalizeNodeId([
   {
     children: [{ text: 'Welcome to the Plate Playground!' }],
     type: 'h1',
+  },
+  {
+    type: 'custom_component',
+    children: [{ text: '' }],
   },
   {
     children: [
